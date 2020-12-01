@@ -1,17 +1,14 @@
-import logo from './logo.svg';
 import './App.css';
 
 import Amplify, {API, graphqlOperation} from 'aws-amplify';
-import Auth from 'aws-amplify';
 
 import awsconfig from './aws-exports';
 
 import * as queries from './graphql/queries';
 import * as mutations from './graphql/mutations';
-import * as subscription from './graphql/subscriptions';
+import * as subscriptions from './graphql/subscriptions';
 
 import {withAuthenticator} from 'aws-amplify-react';
-import {Connect} from 'aws-amplify-react';
 import '@aws-amplify/ui/dist/style.css';
 import { useState, useEffect } from 'react';
 
@@ -27,24 +24,29 @@ const App = () => {
     fetchTodos()
   }, [])
 
+
   function setInput(key, value) {
     setFromState({ ...fromState, [key]: value })
   }
 
   async function fetchTodos() {
     try {
-      const todoData = await API.graphql(graphqlOperation(queries.listTodos));
+      const todoData = await API.graphql(graphqlOperation(queries.listTodos, {limit: 100}));
       const todos = todoData.data.listTodos.items
       setTodos(todos)
+      console.log(todos.length)
     } catch (err) { console.log('error fetching todos') }
   }
+
+
 
   async function addTodo() {
     try {
       if (!fromState.title || !fromState.description) return
       const todo = { ...fromState }
+      console.log(todos);
       setTodos([...todos, todo])
-      setFromState(initialState)
+      setFromState(todo)
       await API.graphql(graphqlOperation(mutations.createTodo, {input: todo}))
     } catch(err) {
       console.log('error creating todo: ', err)
@@ -58,7 +60,7 @@ const App = () => {
         onChange={event => setInput('title', event.target.value)}
         style={styles.input}
         value={fromState.title}
-        placeholder="Titlee"
+        placeholder="Title"
       />
       <input
         onChange={event => setInput('description', event.target.value)}
