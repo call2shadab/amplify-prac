@@ -50,7 +50,7 @@ const App = () => {
       setFromState(todo)
       await API.graphql(graphqlOperation(mutations.createTodo, {input: todo}))
     } catch(err) {
-      console.log('error creating todo: ', err)
+      console.log('error creating todo error: ', err)
     }
   }
 
